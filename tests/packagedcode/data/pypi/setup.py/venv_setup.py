@@ -7,7 +7,7 @@ if sys.version_info[:2] < (2, 6):
     sys.exit('virtualenv requires Python 2.6 or higher.')
 
 try:
-    from setuptools import setup
+    from setuptools import setup # type: ignore
     from setuptools.command.test import test as TestCommand
 
     class PyTest(TestCommand):
