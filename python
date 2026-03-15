@@ -1,0 +1,68 @@
+
+import hashlib
+import os
+import json
+
+def get_hash(filepath):
+    try:
+        with open(filepath, "rb") as f:
+            data = f.read()
+        return hashlib.sha256(data).hexdigest()
+    except FileNotFoundError:
+        return None
+    except Exception as e:
+        print(f"Error reading file '{filepath}': {e}")
+        return None
+
+        CACHE_FILE = "cache.json"
+
+        # Load cache from file if it exists
+        if os.path.exists(CACHE_FILE):
+            try:
+                with open(CACHE_FILE, "r") as f:
+                    cache = json.load(f)
+            except Exception as e:
+                print(f"Error loading cache file: {e}")
+                cache = {}
+        else:
+            cache = {}
+
+        def save_cache():
+            try:
+                with open(CACHE_FILE, "w") as f:
+                    json.dump(cache, f)
+            except Exception as e:
+                print(f"Error saving cache file: {e}")
+
+        # Update process_file to save cache after updating
+        def process_file(filepath):
+            hash_key = get_hash(filepath)
+            if hash_key is None:
+                return f"Error: File '{filepath}' not found or could not be read."
+            if cache_exists(hash_key):
+                return cache[hash_key]
+            else:
+                result = scan_file(filepath)
+                cache[hash_key] = result
+                save_cache()
+                return result
+# Simple in-memory cache for demonstration
+cache = {}
+
+def cache_exists(hash_key):
+    return hash_key in cache
+
+def process_file(filepath):
+    hash_key = get_hash(filepath)
+    if hash_key is None:
+        return f"Error: File '{filepath}' not found or could not be read."
+    if cache_exists(hash_key):
+        return cache[hash_key]
+    else:
+        result = scan_file(filepath)
+        cache[hash_key] = result
+        return result
+
+def scan_file(filepath):
+    # Dummy implementation for demonstration
+    return f"scanned_result for {filepath}"
